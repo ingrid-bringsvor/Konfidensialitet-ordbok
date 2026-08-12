@@ -11,7 +11,7 @@ execute:
 # For å unngå problemer med tomme celler i Emnelapp-kolonnen
 .option[data-value=""] { 
   display: none; 
-  }
+}
 </style>
 
 ```{r}
@@ -24,28 +24,39 @@ ordbok <- read_excel(
   "data/ordbok_konfidensialitet.xlsx",
   skip = 1
 )
+
 # Ignorer tomme rader i excel-filen
 ordbok <- ordbok[!apply(is.na(ordbok), 1, all), ]
 
 visning <- ordbok |>
-  # Lager en ny kolonne som deler opp emnelapper 
+  # Lager en ny kolonne som deler opp emnelapper
   # Så tabeller;metode betyr tabeller+metode, ikke en unik emnelapp
   mutate(
     Emnelapp_filter = strsplit(Emnelapp, "\\s*;\\s*")
   ) |>
+  
   # Gjør listekolonnen om til flere rader slik at Crosstalk kan filtrere
   tidyr::unnest(Emnelapp_filter) |>
+  
   # Fjerner eventuelle mellomrom rundt emnelappene
   mutate(
     Emnelapp_filter = trimws(Emnelapp_filter)
   ) |>
+  
   # Får kildene på HTML-format
+  # og lager sorteringskolonne
   mutate(
+    # Fjerner parenteser KUN fra sorteringsgrunnlaget.
+    # Parentesene beholdes i Norsk term.
+    sortering = stringr::str_remove_all(`Norsk term`, "[()]") |>
+      stringr::str_to_lower(),
+    
     Kilde = if_else(
       # Hvis ingen kilde er oppført, skriv ingenting
       is.na(Kilde) | trimws(Kilde) == "",
       "",
-      # Lager tekstboksen bruker kan klikke på 
+      
+      # Lager tekstboksen bruker kan klikke på
       paste0(
         "<details>",
         "<summary>Vis kilder</summary>",
@@ -56,15 +67,19 @@ visning <- ordbok |>
       )
     )
   ) |>
-  # Velger kolonner 
+  
+  # Sorterer etter sorteringskolonnen
+  arrange(sortering) |>
+  
+  # Velger kolonner
   select(
     `Norsk term`,
     `Engelsk term`,
     Definisjon,
     Emnelapp,
-    # Denne brukes kun av filteret og skjules i tabellen
     Emnelapp_filter,
-    Kilde
+    Kilde,
+    sortering
   )
 
 shared <- SharedData$new(
@@ -72,9 +87,7 @@ shared <- SharedData$new(
   group = "ordbok",
   key = NULL
 )
-```
 
-```{r}
 # Lager et nedtrekkbart filter etter emnelapp
 filter_select(
   id = "emne",
@@ -95,23 +108,34 @@ datatable(
   options = list(
     pageLength = 20,
     autoWidth = FALSE,
-    # Skjuler hjelpekolonnen Emnelapp_filter
+    
     columnDefs = list(
+      # Engelsk term
       list(
         targets = 1,
         width = "150px"
       ),
+      
+      # Skjuler hjelpekolonnen Emnelapp_filter
       list(
         targets = 4,
         visible = FALSE
       ),
-      # Gjør kildekolonnen bredere 
+      
+      # Gjør kildekolonnen bredere
       list(
         targets = 5,
         width = "300px"
+      ),
+      
+      # Skjuler sorteringskolonnen
+      list(
+        targets = 6,
+        visible = FALSE
       )
     )
   ),
+  
   # Hindrer at raden blir "valgt" når bruker klikker på den
   selection = "none",
   width = "100%"
