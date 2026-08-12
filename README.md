@@ -4,7 +4,7 @@ Dette repositoriet inneholder en begrepsordbok bygget med Quarto og R. Ordboken 
 
 ## Nettside
 
-Her finner du lenke til [nettsiden til ordboken](). 
+Her finner du lenke til [nettsiden til ordboken](https://ingrid-bringsvor.github.io/Konfidensialitet-ordbok/). 
 
 ## Oppdatering av innhold
 
