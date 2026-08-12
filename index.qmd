@@ -21,7 +21,7 @@ library(DT)
 library(crosstalk)
 
 ordbok <- read_excel(
-  "data/ordbok_konfidensialitet_basis.xlsx",
+  "data/ordbok_konfidensialitet.xlsx",
   skip = 1
 )
 # Ignorer tomme rader i excel-filen
