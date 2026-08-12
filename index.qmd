@@ -1,0 +1,123 @@
+---
+title: "Ordbok for konfidensialitet"
+format: html
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+<style>
+# For å unngå problemer med tomme celler i Emnelapp-kolonnen
+.option[data-value=""] { 
+  display: none; 
+  }
+</style>
+
+```{r}
+library(readxl)
+library(dplyr)
+library(DT)
+library(crosstalk)
+
+ordbok <- read_excel(
+  "data/ordbok_konfidensialitet_basis.xlsx",
+  skip = 1
+)
+# Ignorer tomme rader i excel-filen
+ordbok <- ordbok[!apply(is.na(ordbok), 1, all), ]
+
+visning <- ordbok |>
+  # Lager en ny kolonne som deler opp emnelapper 
+  # Så tabeller;metode betyr tabeller+metode, ikke en unik emnelapp
+  mutate(
+    Emnelapp_filter = strsplit(Emnelapp, "\\s*;\\s*")
+  ) |>
+  # Gjør listekolonnen om til flere rader slik at Crosstalk kan filtrere
+  tidyr::unnest(Emnelapp_filter) |>
+  # Fjerner eventuelle mellomrom rundt emnelappene
+  mutate(
+    Emnelapp_filter = trimws(Emnelapp_filter)
+  ) |>
+  # Får kildene på HTML-format
+  mutate(
+    Kilde = if_else(
+      # Hvis ingen kilde er oppført, skriv ingenting
+      is.na(Kilde) | trimws(Kilde) == "",
+      "",
+      # Lager tekstboksen bruker kan klikke på 
+      paste0(
+        "<details>",
+        "<summary>Vis kilder</summary>",
+        "<div style='margin-top:0.5em;'>",
+        gsub(";\\s*", "<br>", Kilde),
+        "</div>",
+        "</details>"
+      )
+    )
+  ) |>
+  # Velger kolonner 
+  select(
+    `Norsk term`,
+    `Engelsk term`,
+    Definisjon,
+    Emnelapp,
+    # Denne brukes kun av filteret og skjules i tabellen
+    Emnelapp_filter,
+    Kilde
+  )
+
+shared <- SharedData$new(
+  visning,
+  group = "ordbok",
+  key = NULL
+)
+```
+
+```{r}
+# Lager et nedtrekkbart filter etter emnelapp
+filter_select(
+  id = "emne",
+  label = "Velg emnelapp",
+  sharedData = shared,
+  group = ~Emnelapp_filter,
+  # Tillater bare et valg om gangen
+  multiple = FALSE, 
+  allLevels = FALSE
+)
+
+# Lager tabellen (ordboken)
+datatable(
+  shared,
+  # For å tillate HTML i cellene
+  escape = FALSE,
+  rownames = FALSE,
+  options = list(
+    pageLength = 20,
+    autoWidth = FALSE,
+    # Skjuler hjelpekolonnen Emnelapp_filter
+    columnDefs = list(
+      list(
+        targets = 1,
+        width = "150px"
+      ),
+      list(
+        targets = 4,
+        visible = FALSE
+      ),
+      # Gjør kildekolonnen bredere 
+      list(
+        targets = 5,
+        width = "300px"
+      )
+    )
+  ),
+  # Hindrer at raden blir "valgt" når bruker klikker på den
+  selection = "none",
+  width = "100%"
+)
+
+```
+
+
+
