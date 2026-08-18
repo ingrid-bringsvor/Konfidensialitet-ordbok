@@ -51,9 +51,9 @@ visning <- ordbok |>
     sortering = stringr::str_remove_all(`Norsk term`, "[()]") |>
       stringr::str_to_lower(),
     
-    Kilde = if_else(
+    Kilder = if_else(
       # Hvis ingen kilde er oppført, skriv ingenting
-      is.na(Kilde) | trimws(Kilde) == "",
+      is.na(Kilder) | trimws(Kilder) == "",
       "",
       
       # Lager tekstboksen bruker kan klikke på
@@ -61,7 +61,7 @@ visning <- ordbok |>
         "<details>",
         "<summary>Vis kilder</summary>",
         "<div style='margin-top:0.5em;'>",
-        gsub(";\\s*", "<br>", Kilde),
+        gsub(";\\s*", "<br>", Kilder),
         "</div>",
         "</details>"
       )
@@ -78,7 +78,7 @@ visning <- ordbok |>
     Definisjon,
     Emnelapp,
     Emnelapp_filter,
-    Kilde,
+    Kilder,
     sortering
   )
 
