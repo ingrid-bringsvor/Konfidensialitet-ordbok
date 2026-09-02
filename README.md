@@ -8,4 +8,4 @@ Her finner du lenke til [nettsiden til ordboken](https://ingrid-bringsvor.github
 
 ## Oppdatering av innhold
 
-Begrepene vedlikeholdes i Excel-filen ordbok_konfidensialitet.xlsx som ligger i data-mappen. Hvis det er begreper du mener mangler fra ordboken eller du har rettelser til eksisterende definisjoner kan du gjerne skrive en issue. 
+Begrepene vedlikeholdes i Excel-filen ordbok_konfidensialitet.xlsx som ligger i data-mappen. Hvis det er begreper du mener mangler fra ordboken eller om du har rettelser til eksisterende definisjoner kan du gjerne skrive en issue. 
