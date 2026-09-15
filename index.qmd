@@ -1,3 +1,4 @@
+
 ---
 title: "Ordbok for konfidensialitet"
 format: html
@@ -76,7 +77,6 @@ visning <- ordbok |>
     `Norsk term`,
     `Engelsk term`,
     Definisjon,
-    Emnelapp,
     Emnelapp_filter,
     Kilder,
     sortering
@@ -118,19 +118,14 @@ datatable(
       
       # Skjuler hjelpekolonnen Emnelapp_filter
       list(
-        targets = 4,
+        targets = 3,
         visible = FALSE
       ),
       
-      # Gjør kildekolonnen bredere
-      list(
-        targets = 5,
-        width = "300px"
-      ),
       
       # Skjuler sorteringskolonnen
       list(
-        targets = 6,
+        targets = 5,
         visible = FALSE
       )
     )
